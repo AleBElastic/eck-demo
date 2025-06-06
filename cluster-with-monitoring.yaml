@@ -1,0 +1,20 @@
+apiVersion: elasticsearch.k8s.elastic.co/v1
+kind: Elasticsearch
+metadata:
+  name: quickstart
+spec:
+  version: 8.18.1
+  nodeSets:
+    - name: default
+      count: 3
+      config:
+        node.store.allow_mmap: false
+  monitoring:
+    metrics:
+      elasticsearchRefs:
+      - name: monitoring-cluster
+        namespace: observability
+    logs:
+      elasticsearchRefs:
+      - name: monitoring-cluster
+        namespace: observability

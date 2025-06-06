@@ -1,0 +1,21 @@
+apiVersion: elasticsearch.k8s.elastic.co/v1
+kind: Elasticsearch
+metadata:
+  name: monitoring-cluster
+spec:
+  version: 8.18.1
+  nodeSets:
+    - name: monitoring-nodes
+      count: 1
+      config:
+        node.store.allow_mmap: false
+---
+apiVersion: kibana.k8s.elastic.co/v1
+kind: Kibana
+metadata:
+  name: kibana-monitoring
+spec:
+  version: 8.18.1
+  count: 1
+  elasticsearchRef:
+    name: monitoring-cluster
