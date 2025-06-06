@@ -1,0 +1,49 @@
+#Need to collect the CRDs from the ECK operator
+kubectl create -f https://download.elastic.co/downloads/eck/3.0.0/crds.yaml
+
+#Install the ECK operator
+kubectl apply -f https://download.elastic.co/downloads/eck/3.0.0/operator.yaml
+
+# Get Logs from the ECK operator
+kubectl -n elastic-system logs -f statefulset.apps/elastic-operator
+
+# Show operator pod running
+kubectl get pods -n elastic-system
+
+# Create a simple Elasticsearch cluster and Kibana instance
+#retrieve credentials
+kubectl apply -f basic-deployment.yaml
+
+# Retrieve credentials for ES Cluster and store it somewhere
+PASSWORD=$(kubectl get secret quickstart-es-elastic-user -o go-template='{{.data.elastic | base64decode}}')
+echo $PASSWORD
+
+# Expose Kibana to localhost then go to https://localhost:5601
+kubectl port-forward service/quickstart-kb-http 5601 &
+
+# Scale up the cluster
+kubectl apply -f cluster-3-nodes.yaml
+
+# Perform un upgrade
+kubectl apply -f cluster-upgrade.yaml
+
+
+# Create namespace for monitoring cluster
+kubectl create namespace observability
+
+# Deploy the monitoring cluster
+kubectl apply -f monitoring-deployment.yaml -n observability
+
+# Apply Monitoring Cluster to Elasticsearch
+kubectl apply -f cluster-with-monitoring.yaml
+
+#retrieve credentials monitoring cluster
+PASSWORD_MONITORING=$(kubectl get secret monitoring-cluster-es-elastic-user -n observability -o go-template='{{.data.elastic | base64decode}}')
+echo $PASSWORD_MONITORING
+
+# Port Forward Kibana for monitoring cluster
+kubectl port-forward service/kibana-monitoring-kb-http 5601 -n observability &
+
+
+# end the demo destroy all resources
+
