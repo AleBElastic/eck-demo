@@ -24,9 +24,17 @@ kubectl port-forward service/quickstart-kb-http 5601 &
 # Scale up the cluster
 kubectl apply -f cluster-3-nodes.yaml
 
+# Watchs the pods to see the scaling in action
+kubectl get pods -w 
+
 # Perform un upgrade
 kubectl apply -f cluster-upgrade.yaml
 
+# Watchs the pods upgrading
+kubectl get pods -w
+
+# Check the status of the Elasticsearch cluster - Applying changes moving to GREEN
+kubectl get elasticsearch
 
 # Create namespace for monitoring cluster
 kubectl create namespace observability
@@ -46,4 +54,7 @@ kubectl port-forward service/kibana-monitoring-kb-http 5601 -n observability &
 
 
 # end the demo destroy all resources
-
+kubectl delete elasticsearch quickstart
+kubectl delete elasticsearch monitoring-cluster -n observability
+kubectl delete kibana quickstart
+kubectl delete kibana kibana-monitoring -n observability
